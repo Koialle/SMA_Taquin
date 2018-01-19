@@ -8,21 +8,47 @@ import java.util.logging.Logger;
 import v1.exception.PositionUsedException;
 
 /**
- *
+ * Agent cognitif évoluant dans le jeu du taquin, communiquant avec les autres agents :
+ *  - Objectif local: atteindre une position objectif
+ *  - Objectif global: tous les agents doivent atteindre leur position objectif
+ * 
+ * 
  * @author DUBREUIL Mélanie
  * @author EOUZAN Ophélie
  */
 public class Agent extends Thread {
-    
+    /**
+     * Position courante de l'agent.
+     */
     private Position position;
+    
+    /**
+     * Position objectif de l'agent.
+     */
     private Position objectif;
+    
+    /**
+     * Identifiant de l'agent dans la grille.
+     */
     private final String symbole;
+    
+    /**
+     * File de messages reçus par l'agent, dépilés suivant une logique FIFO (First In, First Out).
+     */
     private Queue<Message> messages = new LinkedList<>();
     
+    /**
+     * Constructeur Agent
+     *
+     * @param symbole "Identifiant" de l'agent
+     */
     public Agent(String symbole) {
         this.symbole = symbole;
     }
 
+    /**
+     * Execute la logique de l'agent.
+     */
     @Override
     public void run() {
         try {
@@ -43,6 +69,12 @@ public class Agent extends Thread {
         }
     }
     
+    /**
+     * Effectue le mouvement vers une position donnée,
+     * et si nécéssaire fais une demande de déplacement à un autre agent.
+     * 
+     * @param position 
+     */
     private void processMovement(Position position) {
         if (position != null) {
             try {
@@ -70,6 +102,11 @@ public class Agent extends Thread {
         }
     }
     
+    /**
+     * Dépile les messages reçus par les autres agents.
+     *
+     * @throws Exception 
+     */
     private synchronized void checkAllMessages() throws Exception {
         //@TODO handle blocking behaviour : when two agents want to exchange position
         Message message = null;
@@ -96,15 +133,20 @@ public class Agent extends Thread {
         }        
     }
     
+    /**
+     * Calcule la prochaine position voulue de l'agent 
+     * en fonction de son objectif global et de sa position courante.
+     *
+     * @return La prochaine position à atteindre.
+     */
     private Position calculateObjective() {
         if (this.position.equals(objectif)) {
             return null;
         }
-            
+
         Position newPosition = new Position();
 
-        // X
-        if (this.position.getX() != objectif.getX()) {
+        if (this.position.getX() != objectif.getX()) { // X
             int newX = position.getX() > objectif.getX() ? position.getX() - 1 : position.getX() + 1;
 
             newPosition = new Position(newX, position.getY());
@@ -114,30 +156,47 @@ public class Agent extends Thread {
             newPosition = new Position(position.getX(), newY);
         }
 
-        //Grille.move(this, newPosition); //@TODO handle exception here ?
         return newPosition;
     }
 
+    /**
+     * @return position La position courante
+     */
     public Position getPosition() {
         return position;
     }
 
+    /**
+     * @param position
+     */
     public void setPosition(Position position) {
         this.position = position;
     }
 
+    /**
+     * @return objectif La position objectif.
+     */
     public Position getObjectif() {
         return objectif;
     }
 
+    /**
+     * @param objectif La position objectif.
+     */
     public void setObjectif(Position objectif) {
         this.objectif = objectif;
     }
 
+    /**
+     * @return symbole L'identifiant de l'agent.
+     */
     public String getSymbole() {
         return this.symbole;
     }
 
+    /**
+     * @param message Ajoute un message dans la file de messages.
+     */
     private synchronized void addMessage(Message message) {
         this.messages.add(message);
     }
