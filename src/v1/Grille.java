@@ -3,6 +3,7 @@ package v1;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import v1.exception.PositionUsedException;
 
 /**
@@ -97,6 +98,35 @@ public class Grille {
         }
         
         return null;
+    }
+    
+    /**
+     * Find a coherent position around the current position of the agent,
+     * used when the agent is asked to move by another agent.
+     *
+     * @param agent
+     * @param random
+     * @return A position
+     */
+    public synchronized static Position move(Agent agent, boolean random) {
+        Position position = agent.getPosition();
+        
+        Random rand = new Random();
+        int newX, newY;
+        do {
+            newX = rand.nextInt(2) - 1;
+            
+            if (newX != 0) {// newX = -1 ou 1
+                newY = 0;
+            } else {
+                newY = rand.nextFloat() < 0.5 ? -1 : 1;
+            }
+
+            newX += position.getX();
+            newY += position.getY();
+        } while (get(newX, newY) != null);
+        
+        return new Position(newX, newY);
     }
     
     /**

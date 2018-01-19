@@ -118,7 +118,7 @@ public class Agent extends Thread {
                     System.out.printf("Agent %s (%d, %d) : Message reçu de %s pour la position (%d, %d)\n", symbole, position.getX(), position.getY(), emetteur.getSymbole(), message.getPosition().getX(), message.getPosition().getY());
 
                     if (this.position.equals(message.getPosition())) {
-                        Position newPosition = Grille.move(this); // get position
+                        Position newPosition = Grille.move(this, true); // get position
 
                         if (newPosition != null) {
                             System.out.printf("Agent %s (%d, %d) : Tentative de déplacement vers (%d, %d) à la demande de %s\n", symbole, position.getX(), position.getY(), newPosition.getX(), newPosition.getY(), emetteur.getSymbole());
