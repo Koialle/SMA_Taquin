@@ -9,28 +9,48 @@ import v1.exception.PositionUsedException;
  *
  * @author Mélanie
  * @author Ophélie
- * 
- * @TODO rename Takin
  */
 public class Grille {
     private static int size;
     private static Map<Position, Agent> agents = new HashMap<>();
     private static Map<Position, Agent> objectifs = new HashMap<>();
 
+    /**
+     * Constructeur Grille. Never used ?
+     */
     private Grille() {
         size = 10;
         agents = new HashMap<>();
         objectifs = new HashMap<>();
     }
 
+    /**
+     * Renvoi l'agent positionné aux coordonnées en paramètre.
+     *
+     * @param x
+     * @param y
+     * @return Un agent
+     */
     public static Agent get(int x, int y) {
         return get(new Position(x, y));
     }
 
+    /**
+     * Renvoi l'agent situé à la position en paramètre.
+     * 
+     * @param position
+     * @return Un agent
+     */
     public static Agent get(Position position) {
         return agents.get(position);
     }
 
+    /**
+     * Ajoute l'agent en paramètre à la grille, 
+     * lui trouve une position libre et un objectif local disponible.
+     *
+     * @param agent 
+     */
     public static void add(Agent agent) {
         Position position, objectif;
         
@@ -65,7 +85,7 @@ public class Grille {
         
         for (int i = -1; i <= 1; i++) {
             for (int y = -1; y < 1; y++) {
-                if (y != i && y != -i) { // n'est pas une diagonale
+                if (y != i && y != -i) { // check que la position n'est pas une diagonale
                     int newX = position.getX() + i;
                     int newY = position.getY() + y;
                     
@@ -96,6 +116,13 @@ public class Grille {
         return true;
     }
 
+    /**
+     * Déplace un agent donné à une position donnée.
+     * 
+     * @param agent
+     * @param position
+     * @throws Exception Si la position fournie est déjà occupée par un autre agent.
+     */
     public synchronized static void move(Agent agent, Position position) throws Exception {
         if (agents.get(position) != null) {
             throw new PositionUsedException(agents.get(position));
@@ -107,7 +134,7 @@ public class Grille {
     }
 
     /**
-     * Affichage de la grille
+     * Affichage de la grille courante.
      */
     public synchronized static void afficher() {
         // Generate border
@@ -133,7 +160,7 @@ public class Grille {
     }
     
     /**
-     * Affichage de la grille objetive
+     * Affichage de la grille objectif.
      */
     public static void afficherObjectifs() {
         // Generate border
