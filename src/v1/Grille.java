@@ -12,7 +12,7 @@ import v1.exception.PositionUsedException;
  * 
  * @TODO rename Takin
  */
-public final class Grille {
+public class Grille {
     private static int size;
     private static Map<Position, Agent> agents = new HashMap<>();
     private static Map<Position, Agent> objectifs = new HashMap<>();
@@ -61,19 +61,17 @@ public final class Grille {
      * @return A position
      */
     public synchronized static Position move(Agent agent) {
-        
-        //@TODO find new position
         Position position = agent.getPosition();
         
         for (int i = -1; i <= 1; i++) {
             for (int y = -1; y < 1; y++) {
                 if (y != i && y != -i) { // n'est pas une diagonale
-                    try {
-                        int newX = position.getX() + i;
-                        int newY = position.getY() + y;
-                        
+                    int newX = position.getX() + i;
+                    int newY = position.getY() + y;
+                    
+                    if (get(newX, newY) == null) {
                         return new Position(newX, newY);
-                    } catch (Exception e) {}
+                    }
                 }
             }
         }

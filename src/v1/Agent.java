@@ -16,7 +16,7 @@ public class Agent extends Thread {
     
     private Position position;
     private Position objectif;
-    private String symbole;
+    private final String symbole;
     private Queue<Message> messages = new LinkedList<>();
     
     public Agent(String symbole) {
@@ -70,18 +70,30 @@ public class Agent extends Thread {
         }
     }
     
-    private synchronized void checkAllMessages() throws Exception {        
-        for (Message message : this.messages) {
-            if (message.getPerformatif().equals(Message.PERFORMATIVE_REQUEST) && message.getAction().equals(Message.ACTION_MOVE)) {
-                if (this.position.equals(message.getPosition())) {                    
-                    Position newPosition = Grille.move(this); // get position 
-                    
-                    this.processMovement(newPosition);
+    private synchronized void checkAllMessages() throws Exception {
+        //@TODO handle blocking behaviour : when two agents want to exchange position
+        Message message = null;
+        while (messages.size() > 0) {
+            message = messages.poll();
+            if (message != null) {
+                if (message.getPerformatif().equals(Message.PERFORMATIVE_REQUEST) && message.getAction().equals(Message.ACTION_MOVE)) {
+                    Agent emetteur = message.getEmetteur();
+                    System.out.printf("Agent %s (%d, %d) : Message reçu de %s pour la position (%d, %d)\n", symbole, position.getX(), position.getY(), emetteur.getSymbole(), message.getPosition().getX(), message.getPosition().getY());
+
+                    if (this.position.equals(message.getPosition())) {
+                        Position newPosition = Grille.move(this); // get position
+
+                        if (newPosition != null) {
+                            System.out.printf("Agent %s (%d, %d) : Tentative de déplacement vers (%d, %d) à la demande de %s\n", symbole, position.getX(), position.getY(), newPosition.getX(), newPosition.getY(), emetteur.getSymbole());
+                        }
+
+                        this.processMovement(newPosition);
+                    } else {
+                        System.out.printf("Agent %s (%d, %d) : Demande de déplacement par %s expirée\n", symbole, position.getX(), position.getY(), emetteur.getSymbole());
+                    }
                 }
             }
-            
-            message = this.messages.poll(); // todo handle dépilement
-        }
+        }        
     }
     
     private Position calculateObjective() {
@@ -128,7 +140,5 @@ public class Agent extends Thread {
 
     private synchronized void addMessage(Message message) {
         this.messages.add(message);
-        
-        System.out.printf("Agent %s: Message reçu de %s\n", symbole, message.getDestinataire().getSymbole());
     }
 }
