@@ -1,6 +1,8 @@
 
 package v1;
 
+import java.util.Scanner;
+
 /**
  *
  * @author Epulapp
@@ -8,26 +10,46 @@ package v1;
 public class Main {
     public static void main(String args[])
     {
-        Agent agent1 = new Agent("X");
-        Agent agent2 = new Agent("Y");
-        Agent agent3 = new Agent("A");
-        Agent agent4 = new Agent("M");
-
-        Grille.setSize(5);
-        Grille.add(agent1);
-        Grille.add(agent2);
-        Grille.add(agent3);
-        Grille.add(agent4);
+        char[] alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
         
+        int tailleTaquin, nbAgents, nbAgentsMax;
+        
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Taille du taquin (< 5): ");
+
+        tailleTaquin = scanner.nextInt();
+        nbAgentsMax = tailleTaquin*tailleTaquin - 1;
+
+        do {
+            System.out.printf("Nombre d'agents (<= %d): ", nbAgentsMax);
+            nbAgents = scanner.nextInt();
+        } while (nbAgents > nbAgentsMax);
+        
+        System.out.println("Initialisation de la grille");
+        Grille.setSize(5);
+        for (int i = 0; i < nbAgents; i++) {
+            
+            String symbole = String.valueOf(alphabet[i % 26]);
+//            System.out.println(symbole);
+            
+//            if (i/26 > 0) {
+//                System.out.println(i/26);
+//                symbole += i/26;
+//            }
+
+            Agent agent = new Agent(symbole);
+            
+            Grille.add(agent);
+        }
+
         System.out.println("Grille initiale");
         Grille.afficher();
         
         System.out.println("Grille objectif");
         Grille.afficherObjectifs();
-        
-        agent1.start();
-        agent2.start();
-        agent3.start();
-        agent4.start();
+
+        for (Agent agent : Grille.getAgents().values()) {
+            agent.start();
+        }
     }
 }
